@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Body Underground</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f0eb; --paper:#fff; --ink:#000; --mid:#595959;
+  --red:#E1251B; --blue:#003399;
+  --c-sah:#9B59B6; --c-egy:#D4A017; --c-col:#E86B1F;
+  --c-ren:#007229; --c-peg:#CE0058; --c-dur:#0098D4;
+  --font:'Noto Sans',Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;font-family:var(--font);color:var(--ink);overflow:hidden;}
+
+header{background:var(--blue);display:flex;align-items:center;gap:20px;padding:0 28px;height:56px;flex-shrink:0;border-bottom:4px solid var(--red);}
+.roundel{position:relative;width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.roundel-ring{position:absolute;inset:0;border-radius:50%;border:5px solid var(--red);}
+.roundel-bar{position:absolute;left:0;right:0;height:10px;background:var(--blue);z-index:1;}
+.roundel-txt{position:absolute;z-index:2;font-size:5px;font-weight:700;color:#fff;text-align:center;line-height:1.3;}
+.h-title{font-size:18px;font-weight:700;color:#fff;flex:1;}
+.h-title span{color:var(--red);}
+.h-back{font-size:12px;color:rgba(255,255,255,.7);cursor:pointer;text-decoration:underline;display:none;margin-right:12px;}
+.h-back:hover{color:#fff;}
+.h-back.on{display:block;}
+.h-lines{display:flex;align-items:center;gap:6px;}
+.h-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2.5px solid rgba(255,255,255,.4);transition:transform .2s;}
+.h-dot:hover{transform:scale(1.3);border-color:#fff;}
+
+#app{display:flex;flex-direction:column;height:100vh;}
+.screen{display:none;flex:1;overflow:hidden;}
+.screen.on{display:flex;flex-direction:column;}
+
+/* MAP */
+#s-map{background:var(--bg);align-items:center;justify-content:center;}
+.map-head{text-align:center;padding:20px 0 16px;}
+.map-head h1{font-size:26px;font-weight:700;margin-bottom:3px;}
+.map-head p{font-size:12px;color:var(--mid);}
+.map-body{flex:1;display:flex;align-items:center;justify-content:center;padding:0 40px 12px;}
+.bwrap{position:relative;width:460px;height:310px;}
+.bwrap svg{position:absolute;top:0;left:0;}
+.bst{position:absolute;transform:translate(-50%,-50%);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:10;}
+.bst:hover .bdot{transform:scale(1.4);}
+.bdot{width:18px;height:18px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--dc,#000);background:var(--dc,#000);transition:transform .18s;}
+.blbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink);white-space:nowrap;background:var(--bg);padding:1px 4px;}
+.map-legend{padding:0 40px 12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.litem{display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:5px 10px;border:1px solid #ccc;background:#fff;transition:border-color .2s;}
+.litem:hover{border-color:#000;}
+.lbar{width:24px;height:5px;border-radius:2px;}
+.map-prompt{font-size:11px;color:var(--mid);text-align:center;padding:0 0 14px;letter-spacing:.06em;text-transform:uppercase;}
+
+/* ORIGIN */
+#s-origin{background:var(--bg);align-items:center;justify-content:center;}
+.ocard{background:var(--paper);max-width:560px;width:90%;border-top:8px solid var(--lc,#000);padding:36px 40px 32px;box-shadow:0 2px 16px rgba(0,0,0,.08);}
+.onotice{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:var(--lc,#000);margin-bottom:14px;}
+.oname{font-size:36px;font-weight:700;line-height:1.1;margin-bottom:8px;}
+.oline{font-size:13px;color:var(--mid);margin-bottom:24px;}
+.obody{font-size:13px;color:var(--mid);margin-bottom:24px;line-height:1.6;}
+.olink{display:inline-block;font-size:12px;font-weight:700;color:var(--lc,#000);text-decoration:underline;cursor:pointer;margin-bottom:20px;}
+.olink:hover{opacity:.7;}
+.octa{display:inline-flex;align-items:center;gap:10px;color:#fff;font-size:13px;font-weight:700;padding:12px 24px;cursor:pointer;border:none;transition:opacity .2s;}
+.octa:hover{opacity:.85;}
+
+/* LINE INFO */
+#s-info{flex-direction:row;}
+.info-left{width:420px;min-width:420px;background:var(--paper);border-right:1px solid #ddd;overflow-y:auto;padding:40px;display:flex;flex-direction:column;gap:16px;}
+.info-ey{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--mid);}
+.info-nm{font-size:22px;font-weight:700;line-height:1.25;}
+.info-mt{font-size:11px;color:var(--mid);font-style:italic;}
+.info-bd{font-size:13px;line-height:1.85;color:#333;}
+.info-cta{display:inline-flex;align-items:center;gap:10px;color:#fff;font-size:12px;font-weight:700;padding:11px 22px;cursor:pointer;border:none;transition:opacity .2s;align-self:flex-start;}
+.info-cta:hover{opacity:.85;}
+.info-right{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;background:#1a1a1a;}
+.info-noimg{color:#555;font-size:13px;}
+
+/* LINE VIEW */
+#s-line{flex-direction:column;background:var(--bg);}
+.dstrip{background:var(--paper);border-bottom:2px solid #ddd;padding:20px 48px 14px;flex-shrink:0;}
+.dstrip-hd{display:flex;align-items:center;gap:16px;margin-bottom:14px;}
+.lpill{display:inline-flex;align-items:center;height:28px;border-radius:14px;overflow:hidden;border:3px solid var(--lc,#000);}
+.lpill-c{width:28px;height:28px;background:var(--lc,#000);margin:-3px;border-radius:50%;flex-shrink:0;}
+.lpill-n{font-size:10px;font-weight:700;color:var(--lc,#000);padding:0 14px 0 10px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+.dtitle{font-size:15px;font-weight:700;}
+.dsub{font-size:11px;color:var(--mid);margin-top:1px;}
+#diag-svg{width:100%;display:block;overflow:visible;}
+.st-area{flex:1;overflow-y:auto;padding:28px 48px;}
+.st-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#bbb;}
+.st-empty p{font-size:12px;text-transform:uppercase;letter-spacing:.12em;}
+.stinfo{display:none;}
+.stinfo.on{display:block;}
+.st-hdr{border-left:6px solid var(--lc,#000);padding:4px 0 4px 16px;margin-bottom:24px;}
+.st-ey{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--mid);margin-bottom:4px;}
+.st-nm{font-size:24px;font-weight:700;line-height:1.15;margin-bottom:5px;}
+.st-dc{font-size:12px;color:var(--mid);}
+.st-grid{display:grid;grid-template-columns:1fr 300px;gap:32px;}
+.st-sec{margin-bottom:22px;}
+.st-sl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--mid);border-bottom:1px solid #ddd;padding-bottom:6px;margin-bottom:12px;}
+.st-why{font-size:13px;line-height:1.8;color:#333;border:1px solid #ddd;background:var(--paper);padding:16px 18px;}
+.st-soon{font-size:13px;color:#aaa;font-style:italic;padding:16px 18px;border:1px dashed #ddd;background:var(--paper);}
+.st-foot{margin-top:12px;padding-top:12px;border-top:1px solid #e0e0e0;font-size:11px;color:var(--mid);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.st-foot-lk{font-size:11px;font-weight:700;color:var(--lc,#000);text-decoration:underline;cursor:pointer;}
+.st-foot-lk:hover{opacity:.7;}
+.tboard{background:#0a0a0a;overflow:hidden;}
+.tboard-hd{background:#151515;padding:9px 16px;display:flex;align-items:center;gap:8px;}
+.tboard-hd span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#ffd700;}
+.trow{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid #1e1e1e;gap:12px;cursor:pointer;transition:background .15s;}
+.trow:last-child{border-bottom:none;}
+.trow:hover{background:#1c1c1c;}
+.tbar{width:5px;height:36px;border-radius:2px;flex-shrink:0;}
+.tinfo{flex:1;}
+.tto{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
+.tnm{font-size:12px;font-weight:700;color:#fff;margin-bottom:1px;}
+.tbp{font-size:10px;color:#555;}
+.tarr{font-size:18px;color:#444;}
+.olist{display:flex;flex-direction:column;}
+.orow{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid #ddd;background:var(--paper);margin-bottom:-1px;cursor:pointer;transition:background .15s;position:relative;}
+.orow:hover{background:#f9f5f0;z-index:1;}
+.obar{width:5px;height:32px;border-radius:2px;flex-shrink:0;}
+.onm{font-size:11px;font-weight:700;flex:1;}
+.obp{font-size:10px;color:var(--mid);}
+.ochv{font-size:14px;color:#bbb;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px;}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div class="roundel">
+    <div class="roundel-ring"></div>
+    <div class="roundel-bar"></div>
+    <div class="roundel-txt">BODY<br>UNDER<br>GROUND</div>
+  </div>
+  <div class="h-title">Body <span>Under</span>ground</div>
+  <div class="h-back" id="hback"></div>
+  <div class="h-lines" id="hlines"></div>
+</header>
+
+<div id="s-map" class="screen on">
+  <div class="map-head"><h1>Underbody Map</h1><p>UCL Collections &middot; Six Objects &middot; Six Lines</p></div>
+  <div class="map-body">
+    <div class="bwrap">
+      <svg width="460" height="310" viewBox="0 0 460 310" fill="none">
+        <ellipse cx="230" cy="44" rx="30" ry="34" stroke="#ccc" stroke-width="1.5"/>
+        <path d="M212 76 Q207 100 204 122 L200 196 Q200 206 212 206 L248 206 Q260 206 260 196 L256 122 Q253 100 248 76Z" stroke="#ccc" stroke-width="1.5"/>
+        <path d="M204 88 Q182 94 172 120 Q166 138 169 155 L186 155 Q189 138 196 118 L204 108Z" stroke="#ccc" stroke-width="1.5"/>
+        <path d="M256 88 Q278 94 288 120 Q294 138 291 155 L274 155 Q271 138 264 118 L256 108Z" stroke="#ccc" stroke-width="1.5"/>
+        <path d="M216 206 L208 282 Q206 295 216 295 L230 295 Q238 295 236 282 L232 206Z" stroke="#ccc" stroke-width="1.5"/>
+        <path d="M244 206 L252 282 Q254 295 244 295 L258 295 Q266 295 264 282 L256 206Z" stroke="#ccc" stroke-width="1.5"/>
+      </svg>
+      <div class="bst" style="left:230px;top:28px;--dc:var(--c-sah)" onclick="goOrigin('sahelanthropus')"><div class="bdot"></div><div class="blbl">Head</div></div>
+      <div class="bst" style="left:230px;top:82px;--dc:var(--c-dur)" onclick="goOrigin('durham')"><div class="bdot"></div><div class="blbl">Throat</div></div>
+      <div class="bst" style="left:218px;top:130px;--dc:var(--c-peg)" onclick="goOrigin('peggy')"><div class="bdot"></div><div class="blbl">Heart</div></div>
+      <div class="bst" style="left:230px;top:174px;--dc:var(--c-ren)" onclick="goOrigin('renal')"><div class="bdot"></div><div class="blbl">Kidney</div></div>
+      <div class="bst" style="left:168px;top:148px;--dc:var(--c-egy)" onclick="goOrigin('egyptian')"><div class="bdot"></div><div class="blbl">Hand</div></div>
+      <div class="bst" style="left:292px;top:114px;--dc:var(--c-col)" onclick="goOrigin('columbian')"><div class="bdot"></div><div class="blbl">Arm</div></div>
+    </div>
+  </div>
+  <div class="map-prompt">Please select a station to start your journey</div>
+</div>
+
+<div id="s-origin" class="screen">
+  <div class="ocard" id="ocard" style="--lc:#000">
+    <div class="onotice" id="onotice"></div>
+    <div class="oname" id="oname"></div>
+    <div class="oline" id="oline"></div>
+    <div class="obody" id="obody"></div>
+    <div class="olink" id="olink"></div>
+    <button class="octa" id="octa"></button>
+  </div>
+</div>
+
+<div id="s-info" class="screen">
+  <div class="info-left">
+    <div class="info-ey">The Line came from the object</div>
+    <div class="info-nm" id="i-nm"></div>
+    <div class="info-mt" id="i-mt"></div>
+    <div class="info-bd" id="i-bd"></div>
+    <button class="info-cta" id="i-cta"></button>
+  </div>
+  <div class="info-right">
+    <div class="info-noimg">Image coming soon</div>
+  </div>
+</div>
+
+<div id="s-line" class="screen">
+  <div class="dstrip">
+    <div class="dstrip-hd">
+      <div class="lpill" id="lpill" style="--lc:#000">
+        <div class="lpill-c" id="lpill-c"></div>
+        <div class="lpill-n" id="lpill-n"></div>
+      </div>
+      <div>
+        <div class="dtitle" id="dtitle"></div>
+        <div class="dsub" id="dsub"></div>
+      </div>
+    </div>
+    <svg id="diag-svg" viewBox="0 0 800 90" height="90"></svg>
+  </div>
+  <div class="st-area">
+    <div class="st-empty" id="st-empty"><div style="font-size:26px;color:#ccc">&#9711;</div><p>Select a station on the diagram above</p></div>
+    <div class="stinfo" id="stinfo"></div>
+  </div>
+</div>
+</div>
+
+<script>
+var L = {
+  sahelanthropus:{name:"Sahelanthropus tchadensis",short:"Sahelanthropus",bp:"Head",color:"#9B59B6",meta:"Fossil cast, c. 7 million years old. UCL Anthropology Collection",desc:"Content coming soon.",sts:[{id:"s-head",nm:"Head",orig:true,dc:"Origin body part"},{id:"s-s2",nm:"Station 2",dc:"Coming soon"},{id:"theme-practice",nm:"Experience & Practice",dc:"Coming soon"},{id:"s-s4",nm:"Station 4",dc:"Coming soon"},{id:"s-s5",nm:"Station 5",dc:"Coming soon"}],why:{}},
+  egyptian:{name:"Egyptian Trial Piece",short:"Egyptian Trial Piece",bp:"Hand",color:"#D4A017",meta:"Limestone, c. 1300 BCE. UCL Petrie Museum",desc:"Content coming soon.",sts:[{id:"e-hand",nm:"Hand",orig:true,dc:"Origin body part"},{id:"e-s2",nm:"Station 2",dc:"Coming soon"},{id:"theme-practice",nm:"Experience & Practice",dc:"Coming soon"},{id:"e-s4",nm:"Station 4",dc:"Coming soon"},{id:"e-s5",nm:"Station 5",dc:"Coming soon"}],why:{}},
+  columbian:{name:"Pre-Columbian Textile",short:"Pre-Columbian Textile",bp:"Arm",color:"#E86B1F",meta:"Textile. UCL Ethnography Collection (Darryl Forde bequest)",desc:"Content coming soon.",sts:[{id:"c-arm",nm:"Arm",orig:true,dc:"Origin body part"},{id:"c-s2",nm:"Station 2",dc:"Coming soon"},{id:"c-s3",nm:"Station 3",dc:"Coming soon"},{id:"theme-death",nm:"Death & Loss",dc:"Coming soon"},{id:"c-s5",nm:"Station 5",dc:"Coming soon"}],why:{}},
+  renal:{name:"Renal Calculus",short:"Renal Calculus",bp:"Kidney",color:"#007229",meta:"Pathological specimen. UCL SciMedicine Collection",desc:"Content coming soon.",sts:[{id:"r-kidney",nm:"Kidney",orig:true,dc:"Origin body part"},{id:"r-s2",nm:"Station 2",dc:"Coming soon"},{id:"theme-pain",nm:"Pain & Suffering",dc:"Coming soon"},{id:"r-s4",nm:"Station 4",dc:"Coming soon"},{id:"r-s5",nm:"Station 5",dc:"Coming soon"}],why:{}},
+  peggy:{name:"Peggy and I in an Air Raid",short:"Peggy and I",bp:"Heart",color:"#CE0058",meta:"Drawing, c. 1940. UCL Slade Collection",desc:"Content coming soon.",sts:[{id:"p-heart",nm:"Heart",orig:true,dc:"Origin body part"},{id:"p-s2",nm:"Station 2",dc:"Coming soon"},{id:"p-s3",nm:"Station 3",dc:"Coming soon"},{id:"p-s4",nm:"Station 4",dc:"Coming soon"},{id:"p-s5",nm:"Station 5",dc:"Coming soon"}],why:{}},
+  durham:{name:"Durham Flexible Pilot Introducer",short:"Durham Introducer",bp:"Throat",color:"#0098D4",meta:"Steel, late nineteenth century. UCL SciMedicine Collection",desc:"Small, narrow, and cold to the touch, this steel instrument combines a ridged handle with a flexible segmented end, often described as a lobster tail. Its worn surface and stamped markings suggest repeated handling and careful cleaning. Though modest in size, it was designed for moments of extreme urgency, when access to the throat could mean the difference between breathing and suffocation.",sts:[{id:"d-throat",nm:"Throat",orig:true,dc:"Origin - where the instrument enters the body"},{id:"theme-practice",nm:"Experience & Practice",dc:"Skill built through repetition and refinement"},{id:"theme-pain",nm:"Pain & Suffering",dc:"Invasive surgery, desperate breath"},{id:"theme-death",nm:"Death & Loss",dc:"The lives this instrument tried and failed to save"},{id:"d-silence",nm:"Institutional Silence",dc:"The quiet museum vs the screaming patient"}],why:{"d-throat":"The Durham Flexible Pilot Introducer is designed to enter the throat. Inserted through an incision in the neck into the airway during emergency tracheotomy - no body part is more immediately at stake than the one that holds breath.","theme-practice":"The instrument's flexible segmented design represents accumulated surgical knowledge. Each modification was a response to failure, each refinement earned through practice on real patients. Its worn surface testifies to the hours of handling required to master it.","theme-pain":"Cutting through a throat to force open an airway is an act of extreme physical violence, even when it saves a life. The steel instrument holds that pain within it, silently. In the museum, the suffering it was part of has been entirely curated away.","theme-death":"Many children died during diphtheria epidemics even with surgical intervention. This instrument was present at those deaths, wielded in desperation, sometimes too late. The textile too speaks of lives and bodies that have passed out of reach.","d-silence":"In a vitrine, this screaming instrument becomes quiet. The contrast between its original context of emergency and its current institutional stillness is one of the most unsettling things about it. The museum has absorbed and neutralised the urgency."}}
+};
+
+function linesAt(sid) {
+  var res = [];
+  for (var k in L) { if (L[k].sts.find(function(s){return s.id===sid;})) res.push(k); }
+  return res;
+}
+
+function show(id) {
+  var screens = document.querySelectorAll(".screen");
+  for (var i=0;i<screens.length;i++) screens[i].classList.remove("on");
+  document.getElementById(id).classList.add("on");
+}
+
+function setBack(txt, fn) {
+  var el = document.getElementById("hback");
+  el.textContent = "<- " + txt;
+  el.className = "h-back on";
+  el.onclick = fn;
+}
+function hideBack() { document.getElementById("hback").className = "h-back"; }
+
+function goOrigin(key) {
+  var line = L[key];
+  var card = document.getElementById("ocard");
+  card.style.setProperty("--lc", line.color);
+  document.getElementById("onotice").textContent = "This is the start of the " + line.name + " Line";
+  document.getElementById("oname").textContent = line.sts[0].nm;
+  document.getElementById("oline").textContent = line.name + " - " + line.bp + " Line";
+  document.getElementById("obody").textContent = "You are at the origin station of the " + line.short + " Line. This is where the object connects to the human body - the " + line.bp.toLowerCase() + ".";
+  var lnk = document.getElementById("olink");
+  lnk.textContent = "Know more about the " + line.name + " ->";
+  lnk.onclick = function(){ goInfo(key); };
+  var cta = document.getElementById("octa");
+  cta.textContent = "Board this line ->";
+  cta.style.background = line.color;
+  cta.onclick = function(){ goLine(key, line.sts[0].id); };
+  show("s-origin");
+  setBack("Body Map", function(){ show("s-map"); hideBack(); });
+}
+
+function goInfo(key) {
+  var line = L[key];
+  document.getElementById("i-nm").textContent = line.name;
+  document.getElementById("i-mt").textContent = line.meta;
+  document.getElementById("i-bd").textContent = line.desc;
+  var cta = document.getElementById("i-cta");
+  cta.textContent = "Begin journey on this line ->";
+  cta.style.background = line.color;
+  cta.onclick = function(){ goLine(key, line.sts[0].id); };
+  show("s-info");
+  setBack(line.bp + " Station", function(){ goOrigin(key); });
+}
+
+function goLine(key, jumpId) {
+  var line = L[key];
+  var lpill = document.getElementById("lpill");
+  lpill.style.setProperty("--lc", line.color);
+  document.getElementById("lpill-c").style.background = line.color;
+  document.getElementById("lpill-n").style.color = line.color;
+  document.getElementById("lpill-n").textContent = line.short;
+  document.getElementById("dtitle").textContent = line.name;
+  document.getElementById("dsub").textContent = line.bp + " Line - " + line.sts.length + " stations";
+  buildDiag(key, null);
+  document.getElementById("st-empty").style.display = "flex";
+  document.getElementById("stinfo").className = "stinfo";
+  document.getElementById("stinfo").innerHTML = "";
+  show("s-line");
+  setBack(line.bp + " Station", function(){ goOrigin(key); });
+  if (jumpId) setTimeout(function(){ pickSt(key, jumpId); }, 80);
+}
+
+function buildDiag(key, activeId) {
+  var line = L[key];
+  var svg = document.getElementById("diag-svg");
+  var n = line.sts.length;
+  var padX = 80, W = 800, y = 46;
+  var step = (W - padX*2) / (n-1);
+  var h = "";
+  h += '<line x1="'+padX+'" y1="'+y+'" x2="'+(W-padX)+'" y2="'+y+'" stroke="'+line.color+'" stroke-width="5" stroke-linecap="round"/>';
+  for (var i=0;i<n;i++) {
+    var st = line.sts[i];
+    var x = Math.round(padX + i*step);
+    var isA = st.id === activeId;
+    var hasT = st.tr && st.tr.length>0;
+    var ly = i%2===0 ? y-20 : y+28;
+    var r = isA ? 11 : 8;
+    if (isA) h += '<circle cx="'+x+'" cy="'+y+'" r="20" fill="'+line.color+'" fill-opacity="0.13"/>';
+    if (hasT) {
+      for (var t=0;t<st.tr.length;t++) {
+        var tk = st.tr[t]; var tl = L[tk];
+        var sy = y+22+t*15;
+        h += '<line x1="'+x+'" y1="'+(y+r)+'" x2="'+x+'" y2="'+(sy-3)+'" stroke="'+tl.color+'" stroke-width="3"/>';
+        h += '<circle cx="'+x+'" cy="'+sy+'" r="5" fill="'+tl.color+'"/>';
+        h += '<text x="'+(x+8)+'" y="'+(sy+4)+'" font-size="9" fill="'+tl.color+'" font-weight="700" font-family="Noto Sans,Arial,sans-serif">'+tl.bp+' line</text>';
+      }
+    }
+    h += '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#fff" stroke="'+line.color+'" stroke-width="'+(isA?4:3)+'" style="cursor:pointer" onclick="pickSt(\''+key+'\',\''+st.id+'\')"/>';
+    if (isA) h += '<circle cx="'+x+'" cy="'+y+'" r="'+(r-4)+'" fill="'+line.color+'"/>';
+    h += '<text x="'+x+'" y="'+ly+'" text-anchor="middle" font-size="11" fill="'+(isA?"#000":"#555")+'" font-weight="'+(isA?"700":"400")+'" font-family="Noto Sans,Arial,sans-serif" style="cursor:pointer" onclick="pickSt(\''+key+'\',\''+st.id+'\')">'+st.nm+'</text>';
+  }
+  svg.innerHTML = h;
+}
+
+function pickSt(key, sid) {
+  buildDiag(key, sid);
+  var line = L[key];
+  var st = null;
+  for (var i=0;i<line.sts.length;i++) { if (line.sts[i].id===sid) { st=line.sts[i]; break; } }
+  var idx = line.sts.indexOf(st);
+  var why = line.why[sid] || null;
+  var ks = linesAt(sid);
+  var trs = [];
+  for (var i=0;i<ks.length;i++) { if (ks[i]!==key) trs.push(ks[i]); }
+
+  var thtml = "";
+  if (trs.length>0) {
+    var rows = "";
+    for (var i=0;i<trs.length;i++) {
+      var tk=trs[i]; var tl=L[tk];
+      rows += '<div class="trow" onclick="goLine(\''+tk+'\',\''+sid+'\')">';
+      rows += '<div class="tbar" style="background:'+tl.color+'"></div>';
+      rows += '<div class="tinfo"><div class="tto">Transfer to</div><div class="tnm">'+tl.name+'</div><div class="tbp">'+tl.bp+' Line</div></div>';
+      rows += '<div class="tarr">&#8250;</div></div>';
+    }
+    thtml = '<div class="st-sec"><div class="st-sl">Interchange - Change here for</div><div class="tboard"><div class="tboard-hd"><span>&#8644; Available Line Transfers</span></div>'+rows+'</div></div>';
+  }
+
+  var orows = "";
+  for (var i=0;i<ks.length;i++) {
+    var lk=ks[i]; var ll=L[lk];
+    orows += '<div class="orow" onclick="goLine(\''+lk+'\',\''+sid+'\')"><div class="obar" style="background:'+ll.color+'"></div><div class="onm">'+ll.name+'</div><div class="obp">'+ll.bp+' Line</div><div class="ochv">&#8250;</div></div>';
+  }
+
+  var whtml = why ? '<div class="st-why">'+why+'</div>' : '<div class="st-soon">Content coming soon</div>';
+
+  document.getElementById("st-empty").style.display = "none";
+  var el = document.getElementById("stinfo");
+  el.className = "stinfo on";
+  el.innerHTML =
+    '<div class="st-hdr" style="border-color:'+line.color+'">'+
+      '<div class="st-ey">Station Information - '+line.short+'</div>'+
+      '<div class="st-nm">'+st.nm+'</div>'+
+      '<div class="st-dc">'+st.dc+'</div>'+
+    '</div>'+
+    '<div class="st-grid">'+
+      '<div>'+
+        '<div class="st-sec"><div class="st-sl">Why '+line.short+' Stops Here</div>'+whtml+'</div>'+
+        '<div class="st-foot" style="--lc:'+line.color+'">'+
+          '<span>Station '+(idx+1)+' of '+line.sts.length+' on the '+line.short+' Line.</span>'+
+          '<span class="st-foot-lk" onclick="goInfo(\''+key+'\')">Know more about the '+line.name+' -></span>'+
+        '</div>'+
+      '</div>'+
+      '<div>'+(ks.length>1?'<div class="st-sec"><div class="st-sl">Change Here For</div><div class="olist">'+orows+'</div></div>':'')+'</div>'+
+    '</div>';
+}
+
+// Build header dots
+(function(){
+  var el = document.getElementById("hlines");
+  var keys = ["sahelanthropus","egyptian","columbian","renal","peggy","durham"];
+  for (var i=0;i<keys.length;i++) {
+    (function(k){
+      var d = document.createElement("div");
+      d.className = "h-dot";
+      d.style.background = L[k].color;
+      d.title = L[k].name;
+      d.onclick = function(){ goOrigin(k); };
+      el.appendChild(d);
+    })(keys[i]);
+  }
+})();
+</script>
+</body>
+</html>
