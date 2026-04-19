@@ -89,7 +89,7 @@ header{
 .sb-body{font-size:16px;color:#555;line-height:1.65;}
 .sb-lines{display:flex;flex-direction:column;gap:8px;}
 .sb-line-row{display:flex;align-items:center;gap:10px;font-size:15px;color:#333;cursor:pointer;padding:2px 0;}
-.sb-line-row:hover span{text-decoration:underline;}
+
 .sb-lbar{width:32px;height:5px;border-radius:2px;flex-shrink:0;}
 .map-footer{background:var(--blue);display:flex;align-items:center;justify-content:space-between;padding:18px 40px;flex-shrink:0;border-top:5px solid var(--red);}
 .mf-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:3px;}
@@ -385,7 +385,9 @@ header{
 
 
 .sb-line-dots{display:flex;gap:4px;align-items:center;margin-left:auto;}
-.sb-st-dot{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--dc);background:transparent;transition:background .3s;}
+.sb-st-dot{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--dc);background:transparent;transition:background .3s,transform .15s;}
+.sb-st-dot-link{cursor:pointer;}
+.sb-st-dot-link:hover{transform:scale(1.6);}
 .sb-st-dot.visited{background:var(--dc);}
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
@@ -447,12 +449,12 @@ header{
         <div class="sb-divider"></div>
         <div class="sb-title">Key to lines</div>
         <div class="sb-lines">
-          <div class="sb-line-row" onclick="goInfo('sahelanthropus')"><div class="sb-lbar" style="background:var(--c-sah)"></div><span>Sahelanthropus tchadensis</span><div class="sb-line-dots" id="dots-sahelanthropus"></div></div>
-          <div class="sb-line-row" onclick="goInfo('egyptian')"><div class="sb-lbar" style="background:var(--c-egy)"></div><span>Egyptian Trial Piece</span><div class="sb-line-dots" id="dots-egyptian"></div></div>
-          <div class="sb-line-row" onclick="goInfo('columbian')"><div class="sb-lbar" style="background:var(--c-col)"></div><span>Pre-Columbian Textile</span><div class="sb-line-dots" id="dots-columbian"></div></div>
-          <div class="sb-line-row" onclick="goInfo('renal')"><div class="sb-lbar" style="background:var(--c-ren)"></div><span>Renal Calculus</span><div class="sb-line-dots" id="dots-renal"></div></div>
-          <div class="sb-line-row" onclick="goInfo('peggy')"><div class="sb-lbar" style="background:var(--c-peg)"></div><span>Peggy and I in an Air Raid</span><div class="sb-line-dots" id="dots-peggy"></div></div>
-          <div class="sb-line-row" onclick="goInfo('durham')"><div class="sb-lbar" style="background:var(--c-dur)"></div><span>Durham Flexible Pilot Introducer</span><div class="sb-line-dots" id="dots-durham"></div></div>
+          <div class="sb-line-row"><div class="sb-lbar" style="background:var(--c-sah)"></div><span>Sahelanthropus tchadensis</span><div class="sb-line-dots" id="dots-sahelanthropus"></div></div>
+          <div class="sb-line-row"><div class="sb-lbar" style="background:var(--c-egy)"></div><span>Egyptian Trial Piece</span><div class="sb-line-dots" id="dots-egyptian"></div></div>
+          <div class="sb-line-row"><div class="sb-lbar" style="background:var(--c-col)"></div><span>Pre-Columbian Textile</span><div class="sb-line-dots" id="dots-columbian"></div></div>
+          <div class="sb-line-row"><div class="sb-lbar" style="background:var(--c-ren)"></div><span>Renal Calculus</span><div class="sb-line-dots" id="dots-renal"></div></div>
+          <div class="sb-line-row"><div class="sb-lbar" style="background:var(--c-peg)"></div><span>Peggy and I in an Air Raid</span><div class="sb-line-dots" id="dots-peggy"></div></div>
+          <div class="sb-line-row"><div class="sb-lbar" style="background:var(--c-dur)"></div><span>Durham Flexible Pilot Introducer</span><div class="sb-line-dots" id="dots-durham"></div></div>
         </div>
       </div>
 
@@ -807,7 +809,8 @@ function renderSidebarDots() {
     for (var i = 0; i < line.sts.length; i++) {
       var st = line.sts[i];
       var visited = window._visited && window._visited[st.id];
-      html += "<div class='sb-st-dot" + (visited ? " visited" : "") + "' style='--dc:" + line.color + "' title='" + st.nm + "'></div>";
+      var oc = "goLine('" + k + "','" + st.id + "')";
+      html += "<div class='sb-st-dot" + (visited ? " visited" : "") + " sb-st-dot-link' style='--dc:" + line.color + "' title='" + st.nm + "' onclick=\"" + oc + "\"></div>";
     }
     container.innerHTML = html;
   }
